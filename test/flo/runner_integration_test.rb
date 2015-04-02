@@ -1,25 +1,26 @@
 require_relative '../minitest_helper'
 require 'flo/runner'
-require 'flo'
+require 'flo/config'
 
 module Flo
-  class RunnerTest < Flo::UnitTest
+  class RunnerIntegrationTest < Flo::UnitTest
 
     def subject
-      @subject ||= Flo::Runner.new(File.join(TEST_ROOT, 'fixtures/basic_setup.rb'))
+      @subject ||= Flo::Runner.new
+      @subject.load_config_file(File.join(FIXTURES_ROOT, 'basic_setup.rb'))
+      @subject
     end
 
     def test_execute_returns_success
       response = subject.execute([:task, :start], {})
 
-      assert_equal true, response.success
+      assert_equal true, response.success?
     end
 
     def test_execute_success_is_false_when_perform_fails
-      skip "Passing in args not yet implemented"
-      response = subject.execute([:task, :start], {success: false})
+      response = subject.execute([:task, :start], [{success: false}])
 
-      assert_equal false, response.success
+      assert_equal false, response.success?
     end
 
   end

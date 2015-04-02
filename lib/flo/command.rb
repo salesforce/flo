@@ -6,7 +6,7 @@ module Flo
       raise ArgumentError.new('.new must be called with a block defining the command') unless blk
       @performer_class = opts[:performer_class] || Flo::Performable
       @tasks = []
-      instance_exec(self, &blk)
+      instance_exec(&blk)
     end
 
     def validate(provider_sym, method_sym, provider_options={})
@@ -18,9 +18,9 @@ module Flo
       tasks << performer_class.new(provider_sym, method_sym, provider_options={})
     end
 
-    def execute(args, runner)
+    def execute(args, providers_hash)
       responses = tasks.inject([]) do |arr, task|
-        response = task.execute(runner)
+        response = task.execute(providers_hash, args)
         arr << response
         return response unless response.success?
         arr

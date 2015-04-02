@@ -66,14 +66,15 @@ module Flo
 
     def test_execute_calls_execute_on_tasks_and_returns_status
       performer_obj = Minitest::Mock.new
-      performer_obj.expect(:execute, SUCCESS_RESPONSE, [Object])
+      providers_hash = Object.new
+      performer_obj.expect(:execute, SUCCESS_RESPONSE, [providers_hash, {}])
       performer_class_mock.expect(:new, performer_obj, [:provider, :perform_success, {}])
 
       @subject_block = Proc.new do
         perform :provider, :perform_success
       end
 
-      assert subject.execute({}, Object.new).success?
+      assert subject.execute({}, providers_hash).success?
 
       [
         performer_obj,
@@ -82,8 +83,10 @@ module Flo
     end
 
     def test_execute_stops_and_returns_failure_if_task_is_not_successful
+      providers_hash = Object.new
+
       validation_obj = Minitest::Mock.new
-      validation_obj.expect(:execute, FAILURE_RESPONSE, [Object])
+      validation_obj.expect(:execute, FAILURE_RESPONSE, [providers_hash, {}])
       performer_class_mock.expect(:new, validation_obj, [:provider, :validate_validation_fails, {}])
 
       performer_obj = Minitest::Mock.new
@@ -94,7 +97,7 @@ module Flo
         perform :provider, :not_called
       end
 
-      refute subject.execute({}, Object.new).success?
+      refute subject.execute({}, providers_hash).success?
 
       [
         validation_obj,
