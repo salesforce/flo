@@ -2,9 +2,11 @@ require 'flo'
 require 'flo/command'
 require 'flo/command_collection'
 require 'flo/performable'
+require 'cleanroom'
 
 module Flo
   class Runner
+    include Cleanroom
 
     attr_reader :commands
 
@@ -15,7 +17,7 @@ module Flo
     end
 
     def load_config_file(config_file)
-      instance_eval(File.read(config_file), config_file, 0)
+      evaluate_file(config_file)
     end
 
     def execute(command_namespace, args={})
@@ -26,10 +28,12 @@ module Flo
       yield(@config) if block_given?
       @config
     end
+    expose :config
 
     def register_command(command_namespace, &blk)
       commands[command_namespace] = command_class.new(command_namespace, &blk)
     end
+    expose :register_command
 
     private
 
