@@ -12,7 +12,7 @@ module Flo
 
     def subject
       @subject_arguments ||= [:foo]
-      @subject_block ||= Proc.new { }
+      @subject_block ||= lambda { }
       @subject ||= Flo::Command.new(
         @subject_arguments,
         performer_class: performer_class_mock,
@@ -38,7 +38,8 @@ module Flo
       performer_obj = Object.new
       performer_class_mock.expect(:new, performer_obj, [Symbol, :validate_example_method, Hash])
 
-      @subject_block = Proc.new { validate :provider_sym, :example_method, {} }
+      subject.validate :provider_sym, :example_method, {}
+
       assert_includes subject.tasks, performer_obj
 
       performer_class_mock.verify
@@ -47,9 +48,7 @@ module Flo
     def test_validate_forwards_any_number_of_arguments
       performer_class_mock.expect(:new, :return_value, [Symbol, Symbol, {options: :hash}])
 
-      @subject_block = Proc.new { validate :class, :method, {options: :hash} }
-
-      subject
+      subject.validate :class, :method, {options: :hash}
 
       performer_class_mock.verify
     end
@@ -58,7 +57,8 @@ module Flo
       performer_obj = Object.new
       performer_class_mock.expect(:new, performer_obj, [Symbol, :example_method, Hash])
 
-      @subject_block = Proc.new { perform :provider_sym, :example_method, {} }
+      subject.perform :provider_sym, :example_method, {}
+
       assert_includes subject.tasks, performer_obj
 
       performer_class_mock.verify
@@ -67,14 +67,14 @@ module Flo
     def test_execute_calls_execute_on_tasks_and_returns_status
       performer_obj = Minitest::Mock.new
       providers_hash = Object.new
-      performer_obj.expect(:execute, SUCCESS_RESPONSE, [providers_hash, {}])
+      performer_obj.expect(:execute, SUCCESS_RESPONSE, [providers_hash, []])
       performer_class_mock.expect(:new, performer_obj, [:provider, :perform_success, {}])
 
-      @subject_block = Proc.new do
+      @subject_block = lambda do
         perform :provider, :perform_success
       end
 
-      assert subject.execute({}, providers_hash).success?
+      assert subject.execute(providers_hash).success?
 
       [
         performer_obj,
@@ -86,18 +86,18 @@ module Flo
       providers_hash = Object.new
 
       validation_obj = Minitest::Mock.new
-      validation_obj.expect(:execute, FAILURE_RESPONSE, [providers_hash, {}])
+      validation_obj.expect(:execute, FAILURE_RESPONSE, [providers_hash, []])
       performer_class_mock.expect(:new, validation_obj, [:provider, :validate_validation_fails, {}])
 
       performer_obj = Minitest::Mock.new
       performer_class_mock.expect(:new, performer_obj, [:provider, :not_called, {}])
 
-      @subject_block = Proc.new do
+      @subject_block = lambda do
         validate :provider, :validation_fails
         perform :provider, :not_called
       end
 
-      refute subject.execute({}, providers_hash).success?
+      refute subject.execute(providers_hash).success?
 
       [
         validation_obj,
@@ -105,13 +105,14 @@ module Flo
       ].each(&:verify)
     end
 
-    def test_state_queries_provider_for_current_state
-      skip "Not implemented yet"
-      provider = Minitest::Mock.new
+    def test_execute_raises_if_required_args_not_passed
+      @subject_block = lambda { |required_argument| }
 
+      # Show that the method call is correct and doesn't raise when arguments are passed
+      subject.execute({}, :foo)
 
-      @subject_block = Proc.new do |state|
-        perform :mock_provider, :mock_action, { arg: state[:jira].attribute }
+      assert_raises(ArgumentError) do
+        subject.execute({})
       end
     end
 

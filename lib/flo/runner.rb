@@ -20,8 +20,8 @@ module Flo
       evaluate_file(config_file)
     end
 
-    def execute(command_namespace, args={})
-      commands[command_namespace].execute(args, config.providers)
+    def execute(command_namespace, *args)
+      commands[command_namespace].execute(config.providers, args)
     end
 
     def config

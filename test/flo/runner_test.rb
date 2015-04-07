@@ -79,7 +79,7 @@ module Flo
       args = {foo: :bar}
       providers_hash = Object.new
       new_command = Minitest::Mock.new
-      new_command.expect(:execute, true, [args, providers_hash])
+      new_command.expect(:execute, true, [providers_hash, [args]])
       command_class_mock.expect(:new, new_command, [:foo])
       config_mock.expect(:providers, providers_hash)
 

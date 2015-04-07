@@ -36,9 +36,5 @@ module Flo
       end
     end
 
-    def test_namespace_can_be_queried_for_list_of_commands
-      skip "Not yet implemented"
-    end
-
   end
 end
