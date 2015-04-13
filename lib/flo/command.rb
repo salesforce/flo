@@ -3,31 +3,31 @@ require 'cleanroom'
 module Flo
   class Command
     include Cleanroom
-    attr_reader :tasks, :definition_lambda
+    attr_reader :tasks, :definition_lambda, :providers
 
     def initialize(name=[], opts={}, &blk)
       raise ArgumentError.new('.new must be called with a block defining the command') unless blk
       @performer_class = opts[:performer_class] || Flo::Performable
+      @providers = opts[:providers] || {}
       @tasks = []
       @definition_lambda = convert_block_to_lambda(blk)
     end
 
     def validate(provider_sym, method_sym, provider_options={})
       validation_method_sym = "validate_#{method_sym}".to_sym
-      tasks << performer_class.new(provider_sym, validation_method_sym, provider_options)
+      tasks << performer_class.new(provider_sym, validation_method_sym, providers, provider_options)
     end
     expose :validate
 
     def perform(provider_sym, method_sym, provider_options={})
-      tasks << performer_class.new(provider_sym, method_sym, provider_options={})
+      tasks << performer_class.new(provider_sym, method_sym, providers, provider_options={})
     end
     expose :perform
 
-    def execute(providers_hash, args=[])
-      evaluate_command_definition(args)
+    def call(*args)
+      evaluate_command_definition(*args)
       responses = tasks.inject([]) do |arr, task|
-
-        response = task.execute(providers_hash, args)
+        response = task.call(*args)
         arr << response
         return response unless response.success?
         arr
@@ -36,7 +36,7 @@ module Flo
 
     private
 
-    def evaluate_command_definition(args=[])
+    def evaluate_command_definition(*args)
       cleanroom.instance_exec(*args, &definition_lambda)
     end
 

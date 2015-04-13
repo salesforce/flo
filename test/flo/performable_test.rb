@@ -5,7 +5,7 @@ module Flo
   class PerformableTest < Flo::UnitTest
 
     def subject
-      @subject ||= Flo::Performable.new(:mock_provider, :example_command, {})
+      @subject ||= Flo::Performable.new(:mock_provider, :example_command, providers_mock)
     end
 
     def providers_mock
@@ -16,20 +16,20 @@ module Flo
       @mock_provider ||= Minitest::Mock.new
     end
 
-    def test_execute_returns_provider_response
+    def test_call_returns_provider_response
       expected_response = Object.new
       mock_provider.expect(:example_command, expected_response)
-      response = subject.execute(providers_mock)
+      response = subject.call
 
       assert_same expected_response, response
       mock_provider.verify
     end
 
-    def test_execute_with_args_passes_args_to_provider
+    def test_call_with_args_passes_args_to_provider
       expected_response = Object.new
       args = {foo: :bar}
       mock_provider.expect(:example_command, expected_response, [args])
-      response = subject.execute(providers_mock, [args])
+      response = subject.call(args)
 
       assert_same expected_response, response
       mock_provider.verify

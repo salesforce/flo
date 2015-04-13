@@ -21,7 +21,7 @@ module Flo
     end
 
     def execute(command_namespace, *args)
-      commands[command_namespace].execute(config.providers, args)
+      commands[command_namespace].call(*args)
     end
 
     def config
@@ -31,7 +31,7 @@ module Flo
     expose :config
 
     def register_command(command_namespace, &blk)
-      commands[command_namespace] = command_class.new(command_namespace, &blk)
+      commands[command_namespace] = command_class.new(command_namespace, providers: config.providers, &blk)
     end
     expose :register_command
 

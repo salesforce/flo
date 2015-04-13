@@ -21,7 +21,7 @@ module Flo
     end
 
     def command_collection_mock
-      @command_collection_mock ||= Minitest::Mock.new
+      @command_collection_mock ||= {}
     end
 
     def config_file_fixture
@@ -45,53 +45,42 @@ module Flo
 
     def test_register_command_adds_new_command_to_collection
       new_command = Object.new
-      command_proc = ->(*args) { :your_command_config_here }
-      command_class_mock.expect(:new, new_command, [:foo])
+      command_class_mock.expect(:new, new_command, [:foo, { providers: {} }])
 
-      command_collection_mock.expect(:[]=, new_command, [:foo, new_command])
-      command_collection_mock.expect(:[], new_command, [:foo])
+      config_mock.expect(:providers, {})
 
-      subject.register_command(:foo, &command_proc)
+      subject.register_command(:foo) { }
 
       assert_equal new_command, subject.commands[:foo]
 
       command_class_mock.verify
-      command_collection_mock.verify
     end
 
     def test_register_command_namespaced_adds_new_command_to_collection
+      config_mock.expect(:providers, {})
       new_command = Object.new
-      command_proc = ->(*args) { :your_command_config_here }
-      command_class_mock.expect(:new, new_command, [[:foo, :bar]])
+      command_class_mock.expect(:new, new_command, [[:foo, :bar], { providers: {} }])
 
-      command_collection_mock.expect(:[]=, new_command, [[:foo, :bar], new_command])
-      command_collection_mock.expect(:[], new_command, [:foo, :bar])
+      @command_collection_mock = {}
 
-      subject.register_command([:foo, :bar], &command_proc)
+      subject.register_command([:foo, :bar]) { }
 
-      assert_equal new_command, subject.commands[:foo, :bar]
+      assert_equal(new_command, subject.commands[[:foo, :bar]])
 
       command_class_mock.verify
-      command_collection_mock.verify
     end
 
     def test_execute_calls_command_with_args
       args = {foo: :bar}
       providers_hash = Object.new
-      new_command = Minitest::Mock.new
-      new_command.expect(:execute, true, [providers_hash, [args]])
-      command_class_mock.expect(:new, new_command, [:foo])
-      config_mock.expect(:providers, providers_hash)
+      new_command = lambda { |args| true }
 
-      command_collection_mock.expect(:[]=, new_command, [:foo, new_command])
-      command_collection_mock.expect(:[], new_command, [:foo])
+      command_class_mock.expect(:new, new_command, [:foo, { providers: providers_hash }])
+      config_mock.expect(:providers, providers_hash)
 
       subject.register_command(:foo)
 
       subject.execute(:foo, args)
-
-      new_command.verify
-      command_collection_mock.verify
     end
 
     def test_load_config_file_evals_file
