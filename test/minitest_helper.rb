@@ -8,6 +8,6 @@ require 'pry'
 
 module Flo
   class UnitTest < Minitest::Test
-
+    self.parallelize_me!
   end
 end

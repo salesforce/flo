@@ -31,7 +31,7 @@ module Flo
     expose :config
 
     def register_command(command_namespace, &blk)
-      commands[command_namespace] = command_class.new(command_namespace, providers: config.providers, &blk)
+      commands[command_namespace] = command_class.new(providers: config.providers, &blk)
     end
     expose :register_command
 

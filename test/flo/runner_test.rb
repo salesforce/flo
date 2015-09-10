@@ -45,7 +45,7 @@ module Flo
 
     def test_register_command_adds_new_command_to_collection
       new_command = Object.new
-      command_class_mock.expect(:new, new_command, [:foo, { providers: {} }])
+      command_class_mock.expect(:new, new_command, [{ providers: {} }])
 
       config_mock.expect(:providers, {})
 
@@ -59,7 +59,7 @@ module Flo
     def test_register_command_namespaced_adds_new_command_to_collection
       config_mock.expect(:providers, {})
       new_command = Object.new
-      command_class_mock.expect(:new, new_command, [[:foo, :bar], { providers: {} }])
+      command_class_mock.expect(:new, new_command, [{ providers: {} }])
 
       @command_collection_mock = {}
 
@@ -75,7 +75,7 @@ module Flo
       providers_hash = Object.new
       new_command = lambda { |args| true }
 
-      command_class_mock.expect(:new, new_command, [:foo, { providers: providers_hash }])
+      command_class_mock.expect(:new, new_command, [{ providers: providers_hash }])
       config_mock.expect(:providers, providers_hash)
 
       subject.register_command(:foo)

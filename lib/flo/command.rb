@@ -3,38 +3,36 @@ require 'cleanroom'
 module Flo
   class Command
     include Cleanroom
-    attr_reader :tasks, :definition_lambda, :providers
 
-    def initialize(name=[], opts={}, &blk)
+    def initialize(opts={}, &blk)
       raise ArgumentError.new('.new must be called with a block defining the command') unless blk
-      @performer_class = opts[:performer_class] || Flo::Performable
       @providers = opts[:providers] || {}
       @tasks = []
       @definition_lambda = convert_block_to_lambda(blk)
     end
 
-    def validate(provider_sym, method_sym, provider_options={})
-      validation_method_sym = "validate_#{method_sym}".to_sym
-      tasks << performer_class.new(provider_sym, validation_method_sym, providers, provider_options)
-    end
-    expose :validate
-
     def perform(provider_sym, method_sym, provider_options={})
-      tasks << performer_class.new(provider_sym, method_sym, providers, provider_options={})
+      tasks << [providers[provider_sym].method(method_sym), provider_options]
     end
     expose :perform
 
-    def call(*args)
-      evaluate_command_definition(*args)
-      responses = tasks.inject([]) do |arr, task|
-        response = task.call(*args)
-        arr << response
+    alias :validate :perform
+    expose :validate
+
+    def call(args={})
+      evaluate_command_definition(args)
+      response = tasks.map do |command, options|
+        response = command.call(options.merge(args))
+
+        # bail early if the command failed
         return response unless response.success?
-        arr
+        response
       end.last
     end
 
     private
+
+    attr_reader :tasks, :definition_lambda, :providers
 
     def evaluate_command_definition(*args)
       cleanroom.instance_exec(*args, &definition_lambda)
@@ -55,7 +53,6 @@ module Flo
       @cleanroom ||= self.class.send(:cleanroom).new(self)
     end
 
-    attr_reader :performer_class
 
   end
 end
