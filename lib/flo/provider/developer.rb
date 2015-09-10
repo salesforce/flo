@@ -13,6 +13,10 @@ module Flo
         success = opts[:success].nil? ? true : opts[:success]
         Flo::Provider::Response.new(success)
       end
+
+      def return_true
+        true
+      end
     end
   end
 end

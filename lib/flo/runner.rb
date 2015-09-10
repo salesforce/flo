@@ -1,7 +1,7 @@
 require 'flo'
 require 'flo/command'
 require 'flo/command_collection'
-require 'flo/performable'
+require 'flo/state'
 require 'cleanroom'
 
 module Flo

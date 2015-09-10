@@ -8,8 +8,10 @@ module Flo
     def subject
       @subject_block ||= lambda { }
       @providers ||= { mocked_provider: mock }
+      @state_class_mock ||= Object
       @subject ||= Flo::Command.new(
         providers: @providers,
+        state_class: @state_class_mock,
         &@subject_block
       )
     end
@@ -77,13 +79,36 @@ module Flo
       refute mock.provider_method_called
     end
 
-    class MockProvider
-      attr_reader :args, :provider_method_called, :failed_provider_method_called
+    def test_state_is_not_invoked_during_configuration_phase
+      @state_class_mock = Minitest::Mock.new
+      state_mock = Minitest::Mock.new
+      @state_class_mock.expect(:new, state_mock, [mock])
 
-      def initialize()
-        @provider_method_called = false
-        @failed_provider_method_called = false
+      state_mock.expect(:state_method, lambda { raise "This should never be evaluated" }, [] )
+      subject.perform :mocked_provider, :provider_method, {evaluated_later: subject.state(:mocked_provider).state_method }
+    end
+
+    def test_state_is_invoked_during_call_phase
+      lambda_invoked = false
+
+      @state_class_mock = Minitest::Mock.new
+      state_mock = Minitest::Mock.new
+      @state_class_mock.expect(:new, state_mock, [mock])
+
+      state_mock.expect(:state_method, lambda { lambda_invoked = true; :return_value }, [] )
+
+      @subject_block = lambda do |*args|
+        perform :mocked_provider, :provider_method, {evaluated_later: state(:mocked_provider).state_method }
       end
+
+      subject.call
+
+      assert_equal({evaluated_later: :return_value}, mock.args)
+      assert lambda_invoked, "Provider method was never invoked"
+    end
+
+    class MockProvider
+      attr_reader :args, :provider_method_called, :failed_provider_method_called, :state_method_called
 
       def provider_method(args={})
         @args = args
@@ -94,6 +119,10 @@ module Flo
       def failed_provider_method(args={})
         @failed_provider_method_called = true
         OpenStruct.new(success: false)
+      end
+
+      def state_method
+        @state_method_called = true
       end
     end
 

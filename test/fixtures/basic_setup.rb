@@ -5,5 +5,5 @@ config do |cfg|
 end
 
 register_command([:task, :start]) do |success: true|
-  perform :developer, :is_successful, { success: true }
+  perform :developer, :is_successful, { success: state(:developer).return_true }
 end

@@ -6,6 +6,7 @@ module Flo
 
     def initialize(opts={}, &blk)
       raise ArgumentError.new('.new must be called with a block defining the command') unless blk
+      @state_class = opts[:state_class] || Flo::State
       @providers = opts[:providers] || {}
       @tasks = []
       @definition_lambda = convert_block_to_lambda(blk)
@@ -19,12 +20,20 @@ module Flo
     alias :validate :perform
     expose :validate
 
+    def state(provider_sym)
+      state_class.new(providers[provider_sym])
+    end
+    expose :state
+
     def call(args={})
       evaluate_command_definition(args)
-      response = tasks.map do |command, options|
-        response = command.call(options.merge(args))
+      response = tasks.map do |task, options|
+        combined_args = evaluate_proc_values(options.merge(args))
 
-        # bail early if the command failed
+        response = task.call(combined_args)
+        # response = task.call(options.merge(args))
+
+        # bail early if the task failed
         return response unless response.success?
         response
       end.last
@@ -32,7 +41,7 @@ module Flo
 
     private
 
-    attr_reader :tasks, :definition_lambda, :providers
+    attr_reader :tasks, :definition_lambda, :providers, :state_class
 
     def evaluate_command_definition(*args)
       cleanroom.instance_exec(*args, &definition_lambda)
@@ -47,6 +56,14 @@ module Flo
         cleanroom.define_singleton_method(:_command_definition, &blk)
         cleanroom.method(:_command_definition).to_proc
       end
+    end
+
+    def evaluate_proc_values(args={})
+      hsh = {}
+      args.each do |k, v|
+        hsh[k] = v.is_a?(Proc) ? v.call : v
+      end
+      hsh
     end
 
     def cleanroom
