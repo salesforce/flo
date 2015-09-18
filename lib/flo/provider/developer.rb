@@ -15,7 +15,12 @@ module Flo
       end
 
       def return_true
-        true
+        Flo::Provider::Response.new(true)
+      end
+
+      def echo(opts={})
+        puts opts.inspect
+        Flo::Provider::Response.new(true)
       end
     end
   end
