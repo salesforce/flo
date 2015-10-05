@@ -27,6 +27,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+require 'simplecov'
+SimpleCov.start
+
+SimpleCov.configure do
+  add_filter "/test/"
+end
+
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 TEST_ROOT = File.dirname(__FILE__)
 FIXTURES_ROOT = File.expand_path('../fixtures', __FILE__)

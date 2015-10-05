@@ -30,6 +30,9 @@
 require "flo/version"
 require "flo/runner"
 
+# Parent module for all Flo related functionality.  Should not be used directly.
+# See {file:README.md} or {Runner} for information on overall usage.
+#
 module Flo
 
 end

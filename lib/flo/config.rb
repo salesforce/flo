@@ -30,6 +30,10 @@
 module Flo
   MissingRequireError = Class.new(StandardError)
 
+  # Instantiates and stores providers for use in command definitions
+  #
+  # @attr_reader providers [Hash] Hash of provider instances
+  #
   class Config
     attr_reader :providers
 
@@ -37,6 +41,12 @@ module Flo
       @providers = {}
     end
 
+    # Instantiate a provider and add it to the {#providers} collection
+    # @param provider_sym [Symbol]
+    # @param options [Hash] Options to be passed to provider initialization
+    # @yield Yields the block to the provider initializer, in case the provider
+    # accepts a block
+    #
     def provider(provider_sym, options={}, &blk)
       @providers[provider_sym] = provider_class(provider_sym).new(options, &blk)
     end
