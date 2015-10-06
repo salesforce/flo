@@ -51,6 +51,7 @@ module Flo
     def initialize(opts={}, &blk)
       raise ArgumentError.new('.new must be called with a block defining the command') unless blk
       @state_class = opts[:state_class] || Flo::State
+      @task_class = opts[:task_class] || Flo::Task
       @providers = opts[:providers] || {}
       @tasks = []
       @definition_lambda = convert_block_to_lambda(blk)
@@ -66,7 +67,7 @@ module Flo
     #   during the execution stage when #{#call} is invoked
     #
     def perform(provider_sym, method_sym, provider_options={})
-      tasks << [providers[provider_sym].method(method_sym), provider_options]
+      tasks << @task_class.new(providers[provider_sym], method_sym, provider_options)
     end
     expose :perform
 
@@ -100,10 +101,9 @@ module Flo
     #
     def call(args={})
       evaluate_command_definition(args)
-      response = tasks.map do |task, options|
-        combined_args = evaluate_proc_values(options.merge(args))
+      response = tasks.map do |task|
 
-        response = task.call(combined_args)
+        response = task.call(args)
 
         # bail early if the task failed
         return response unless response.success?
@@ -128,14 +128,6 @@ module Flo
         cleanroom.define_singleton_method(:_command_definition, &blk)
         cleanroom.method(:_command_definition).to_proc
       end
-    end
-
-    def evaluate_proc_values(args={})
-      hsh = {}
-      args.each do |k, v|
-        hsh[k] = v.is_a?(Proc) ? v.call : v
-      end
-      hsh
     end
 
     def cleanroom

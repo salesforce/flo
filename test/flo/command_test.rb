@@ -41,6 +41,7 @@ module Flo
       @subject ||= Flo::Command.new(
         providers: @providers,
         state_class: @state_class_mock,
+        task_class: MockTask,
         &@subject_block
       )
     end
@@ -66,46 +67,24 @@ module Flo
       end
     end
 
-    def test_call_calls_method_on_provider
+    def test_task_called_with_args
       @subject_block = lambda do |*args|
-        perform :mocked_provider, :provider_method
+        perform :mocked_provider, :provider_method, baz: 2
       end
 
-      subject.call
+      result = subject.call(bar: 1)
 
-      assert mock.provider_method_called
-    end
-
-    def test_validate_calls_method_on_provider
-      @subject_block = lambda do |*args|
-        validate :mocked_provider, :provider_method
-      end
-
-      subject.call
-
-      assert mock.provider_method_called
-    end
-
-    def test_call_merges_command_options_with_task_options
-      @subject_block = lambda do |*args|
-        perform :mocked_provider, :provider_method, { task_option: :b }
-      end
-
-      subject.call(command_option: :a)
-
-      assert_equal({command_option: :a, task_option: :b}, mock.args)
+      assert_equal([{ bar: 1 }], result.args_passed)
+      assert_equal({ baz: 2 }, result.args_initialized.last)
     end
 
     def test_call_stops_and_returns_failure_early_if_task_is_not_successful
       @subject_block = lambda do |*args|
-        perform :mocked_provider, :failed_provider_method
-        perform :mocked_provider, :provider_method
+        perform :mocked_provider, :failed_provider_method, {success: false}
+        perform :mocked_provider, :provider_method, {fail: true}
       end
 
       refute subject.call.success?
-
-      assert mock.failed_provider_method_called
-      refute mock.provider_method_called
     end
 
     def test_state_is_not_invoked_during_configuration_phase
@@ -117,44 +96,24 @@ module Flo
       subject.perform :mocked_provider, :provider_method, {evaluated_later: subject.state(:mocked_provider).state_method }
     end
 
-    def test_state_is_invoked_during_call_phase
-      lambda_invoked = false
-
-      @state_class_mock = Minitest::Mock.new
-      state_mock = Minitest::Mock.new
-      @state_class_mock.expect(:new, state_mock, [mock])
-
-      state_mock.expect(:state_method, lambda { lambda_invoked = true; :return_value }, [] )
-
-      @subject_block = lambda do |*args|
-        perform :mocked_provider, :provider_method, {evaluated_later: state(:mocked_provider).state_method }
-      end
-
-      subject.call
-
-      assert_equal({evaluated_later: :return_value}, mock.args)
-      assert lambda_invoked, "Provider method was never invoked"
-    end
-
     class MockProvider
-      attr_reader :args, :provider_method_called, :failed_provider_method_called, :state_method_called
-
-      def provider_method(args={})
-        @args = args
-        @provider_method_called = true
-        OpenStruct.new(success: true)
-      end
-
-      def failed_provider_method(args={})
-        @failed_provider_method_called = true
-        OpenStruct.new(success: false)
-      end
+      attr_reader :args, :state_method_called
 
       def state_method
         @state_method_called = true
       end
     end
 
+    class MockTask
+      def initialize(*args)
+        @initial_args = args
+      end
+
+      def call(*args)
+        fail("This task should never have been called") if @initial_args.last.fetch(:fail, false)
+        success = @initial_args.last.fetch(:success, true)
+        OpenStruct.new(success?: success, args_passed: args, args_initialized: @initial_args)
+      end
+    end
   end
 end
-
