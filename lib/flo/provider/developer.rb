@@ -44,7 +44,7 @@ module Flo
       end
 
       def return_true
-        Flo::Provider::Response.new(true)
+        true
       end
 
       def echo(opts={})
