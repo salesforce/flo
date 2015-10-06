@@ -75,11 +75,10 @@ module Flo
     # @param command_namespace [Array<Symbol>] An array containing the name of
     #   the command as a symbol, including the namespace.  For example, the
     #   command "issue submit" would become [:issue, :submit]
-    # @param *args [Hash] Options that will get passed to the command
+    # @param args={} [Hash] Options that will get passed to the command
     #
-    # @return [type] [description]
-    def execute(command_namespace, *args)
-      commands[command_namespace].call(*args)
+    def execute(command_namespace, args={})
+      commands[command_namespace].call(args)
     end
 
     # @api dsl

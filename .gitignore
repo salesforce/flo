@@ -5,3 +5,4 @@ pkg
 tmp
 .yardoc/
 coverage
+doc
