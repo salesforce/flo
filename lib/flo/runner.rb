@@ -32,6 +32,7 @@ require 'flo/command'
 require 'flo/command_collection'
 require 'flo/state'
 require 'flo/config'
+require 'flo/task'
 require 'cleanroom'
 
 module Flo
