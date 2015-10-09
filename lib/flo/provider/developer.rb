@@ -3,16 +3,13 @@
 # Licensed under the BSD 3-Clause license.
 # For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
+require 'flo/provider/base'
 require 'ostruct'
 
 module Flo
   module Provider
     Response = Struct.new(:success?)
-    class Developer
-
-      def initialize(options={})
-
-      end
+    class Developer < Flo::Provider::Base
 
       def is_successful(opts={})
         success = opts[:success].nil? ? true : opts[:success]
