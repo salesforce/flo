@@ -5,6 +5,7 @@
 
 require_relative '../minitest_helper'
 require 'flo/config'
+require 'yaml'
 
 module Flo
   class ConfigTest < Flo::UnitTest
@@ -25,7 +26,19 @@ module Flo
       end
     end
 
+    def test_cred_store_defaults_to_yaml
+      assert_kind_of Flo::CredStore::YamlStore, subject.cred_store
+    end
+
+    def test_cred_store_can_be_assigned
+      expected_cred_store = Object.new
+
+      subject.cred_store = expected_cred_store
+
+      assert_same expected_cred_store, subject.cred_store
+    end
   end
+
   module Provider
     class MockProvider
       def initialize(args={})

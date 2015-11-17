@@ -6,7 +6,8 @@
 require 'flo/provider/developer'
 
 config do |cfg|
-  cfg.provider :developer
+  cfg.cred_store = Flo::CredStore::YamlStore.new(File.join(FIXTURES_ROOT, "cred_example.yml"))
+  cfg.provider :developer, password: cfg.creds['some_value']
 end
 
 register_command([:task, :start]) do |success: true|

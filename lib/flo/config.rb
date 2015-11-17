@@ -3,6 +3,8 @@
 # Licensed under the BSD 3-Clause license.
 # For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
+require 'flo/cred_store/yaml_store'
+
 module Flo
   MissingRequireError = Class.new(StandardError)
 
@@ -11,6 +13,7 @@ module Flo
   # @attr_reader providers [Hash] Hash of provider instances
   #
   class Config
+    attr_writer :cred_store
     attr_reader :providers
 
     def initialize
@@ -26,6 +29,12 @@ module Flo
     def provider(provider_sym, options={}, &blk)
       @providers[provider_sym] = provider_class(provider_sym).new(options, &blk)
     end
+
+    def cred_store
+      @cred_store ||= Flo::CredStore::YamlStore.new
+    end
+
+    alias :creds :cred_store
 
     private
 
