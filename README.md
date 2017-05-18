@@ -1,5 +1,5 @@
 # Flo
-[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate) [![Build Status](https://semaphoreci.com/api/v1/justinpowers/flo/branches/master/shields_badge.svg)](https://semaphoreci.com/justinpowers/flo)
+[![Gem Version](https://badge.fury.io/rb/flo.svg)](https://badge.fury.io/rb/flo) [![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate) [![Build Status](https://semaphoreci.com/api/v1/justinpowers/flo/branches/master/shields_badge.svg)](https://semaphoreci.com/justinpowers/flo)
 
 
 Flo is a local workflow automation tool that helps you get things done.  This gem contains the core functionality for Flo, plugins for interacting with various systems can be found in separate provider gems.
