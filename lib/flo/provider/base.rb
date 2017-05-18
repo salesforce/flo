@@ -26,7 +26,7 @@ module Flo
           @options[key] = opts.fetch(key, definition.default)
         end
 
-        missing_required = self.class.option_keys.keep_if {|k,v| v.required }.keys - @options.keep_if { |k,v| !v.nil? }.keys
+        missing_required = self.class.option_keys.keep_if {|_k,v| v.required }.keys - @options.keep_if { |_k,v| !v.nil? }.keys
         unless missing_required.empty?
           raise MissingOptionError.new("#{self.class.name} invoked without required options: #{missing_required.join(' ')}")
         end

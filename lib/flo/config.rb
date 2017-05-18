@@ -42,7 +42,7 @@ module Flo
       klass = camel_case(provider_sym.to_s)
       klass_name = "Flo::Provider::#{klass}"
       Object.const_get(klass_name)
-    rescue NameError => e
+    rescue NameError
       raise MissingRequireError.new("#{klass_name} is not loaded.  Please require the library before use")
     end
 
