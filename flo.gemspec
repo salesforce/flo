@@ -14,13 +14,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Justin Powers"]
   spec.email         = ["justinspowers@gmail.com"]
   spec.summary       = %q{Simple developer workflow automation}
-  spec.description   = spec.summary
+  spec.description   = %q{Flo is a local workflow automation tool that helps you get things done.  This gem contains the core functionality for Flo, plugins for interacting with various systems can be found in separate provider gems.}
   spec.homepage      = "https://github.com/salesforce/flo"
   spec.license       = "BSD-3-Clause"
 
   spec.files         = `git ls-files -z`.split("\x0")
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = spec.files.grep(%r{^test/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency "cleanroom"

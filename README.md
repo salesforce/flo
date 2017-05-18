@@ -1,4 +1,6 @@
 # Flo
+[![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/codeclimate/codeclimate) [![Build Status](https://semaphoreci.com/api/v1/justinpowers/flo/branches/master/shields_badge.svg)](https://semaphoreci.com/justinpowers/flo)
+
 
 Flo is a local workflow automation tool that helps you get things done.  This gem contains the core functionality for Flo, plugins for interacting with various systems can be found in separate provider gems.
 
@@ -19,6 +21,10 @@ Or install it yourself as:
 ```shell
 $ gem install flo
 ```
+
+## Documentation
+https://www.rubydoc.info/github/salesforce/flo/
+
 ## Usage
 
 ### Command line usage
