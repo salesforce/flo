@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["justinspowers@gmail.com"]
   spec.summary       = %q{Simple developer workflow automation}
   spec.description   = spec.summary
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/salesforce/flo"
   spec.license       = "BSD-3-Clause"
 
   spec.files         = `git ls-files -z`.split("\x0")
