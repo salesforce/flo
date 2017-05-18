@@ -38,7 +38,7 @@ runner = Flo::Runner.new
 # Load your custom command configurations (see .flo file section for more details)
 runner.load_config_file(File.join(__dir__,'.flo'))
 
-# Run the something:useful command defined in the .flo file 
+# Run the something:useful command defined in the .flo file
 response = runner.execute([:something, :useful], id: '123')
 ```
 
@@ -85,7 +85,7 @@ end
 
 ## License
 
->Copyright (c) 2015, Salesforce.com, Inc.
+>Copyright (c) 2017, Salesforce.com, Inc.
 >All rights reserved.
 >
 >Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
