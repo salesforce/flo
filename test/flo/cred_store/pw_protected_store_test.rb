@@ -26,10 +26,12 @@ module Flo
         @cred_file_location ||= Tempfile.new('cred_store.yml.gpg')
       end
 
-      # Super hacky workaround.  Must use GPG 1.4, otherwise interactive password prompt
+      # Must use GPG 1.4, otherwise interactive password prompt
       # will always pop up in the middle of the tests.
-      def setup
-        GPGME::gpgme_set_engine_info(GPGME::PROTOCOL_OpenPGP, '/usr/local/bin/gpg', nil)
+      def ensure_gpg_version!
+        @testable_version ||= GPGME::Engine.info.select { |e| e.version && e.version.match(/^1\.4/) }.first
+        skip('GPG 1.4 not found, skipping gpg tests') unless @testable_version
+        GPGME::gpgme_set_engine_info(GPGME::PROTOCOL_OpenPGP, @testable_version.file_name, nil)
       end
 
       def teardown
@@ -45,6 +47,8 @@ module Flo
 
       # TODO: Make this test work with GPG 2.0 or 2.1
       def test_element_reference_fetches_a_value_from_yaml_file
+        ensure_gpg_version!
+
         fixture_content = File.read(yaml_fixture)
         assert_equal 'foo', ::YAML.load(fixture_content)['provider']['key'], "Yaml fixture doesn't contain the required value, test will fail for the wrong reason"
         encryptor.encrypt(fixture_content, symmetric: true, output: cred_file_location)
@@ -59,10 +63,12 @@ module Flo
 
       def test_inspect_does_not_reveal_password
         @password = 'should_not_be_revealed'
-        refute_match /#{@password}/, subject.inspect
+        refute_match(/#{@password}/, subject.inspect)
       end
 
       def test_encrypt_file_properly_encrypts_existing_file
+        ensure_gpg_version!
+
         expected = File.read(yaml_fixture)
 
         encrypted_outcome = subject.encrypt_file(yaml_fixture)

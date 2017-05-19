@@ -23,7 +23,7 @@ $ gem install flo
 ```
 
 ## Documentation
-https://www.rubydoc.info/github/salesforce/flo/
+http://www.rubydoc.info/github/salesforce/flo/
 
 ## Usage
 
