@@ -11,6 +11,8 @@ module Flo
     Response = Struct.new(:success?)
     class Developer < Flo::Provider::Base
 
+      option :password, nil, required: false
+
       def is_successful(opts={})
         success = opts[:success].nil? ? true : opts[:success]
         Flo::Provider::Response.new(success)
@@ -23,6 +25,10 @@ module Flo
       def echo(opts={})
         puts opts.inspect
         Flo::Provider::Response.new(true)
+      end
+
+      def has_option(opts={})
+        Flo::Provider::Response.new(options.include?(opts[:option]))
       end
     end
   end
