@@ -45,15 +45,25 @@ module Flo
         @yaml_fixture ||= File.join(FIXTURES_ROOT, 'cred_example.yml')
       end
 
-      # TODO: Make this test work with GPG 2.0 or 2.1
-      def test_element_reference_fetches_a_value_from_yaml_file
+      # # TODO: Make this test work with GPG 2.0 or 2.1
+      # def test_element_reference_fetches_a_value_from_yaml_file
+      #   ensure_gpg_version!
+
+      #   fixture_content = File.read(yaml_fixture)
+      #   assert_equal 'foo', ::YAML.load(fixture_content)['provider']['key'], "Yaml fixture doesn't contain the required value, test will fail for the wrong reason"
+      #   encryptor.encrypt(fixture_content, symmetric: true, output: cred_file_location)
+
+      #   assert_equal 'foo', subject['provider']['key'], "The key either doesn't exist or the file did not decrypt properly"
+      # end
+
+      def test_credentials_for_fetches_credentials_for_provider
         ensure_gpg_version!
 
         fixture_content = File.read(yaml_fixture)
-        assert_equal 'foo', ::YAML.load(fixture_content)['provider']['key'], "Yaml fixture doesn't contain the required value, test will fail for the wrong reason"
+        assert_equal 'foo', ::YAML.load(fixture_content)[:provider]['key'], "Yaml fixture doesn't contain the required value, test will fail for the wrong reason"
         encryptor.encrypt(fixture_content, symmetric: true, output: cred_file_location)
 
-        assert_equal 'foo', subject['provider']['key'], "The key either doesn't exist or the file did not decrypt properly"
+        assert_equal 'foo', subject.credentials_for(:provider)['key'], "The key either doesn't exist or the file did not decrypt properly"
       end
 
       def test_can_initialize_with_file_path_string

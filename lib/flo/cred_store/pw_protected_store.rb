@@ -14,10 +14,18 @@ module Flo
         @cred_file_location = opts[:cred_file_location]
       end
 
-      def [](key)
-        YAML.load(decrypted_file.read)[key]
+      # Decrypts the credentials file and returns the credentials for the requested provider
+      # @param provider_sym [Symbol]
+      # @returns Hash
+      #
+      def credentials_for(provider_sym)
+        Flo::CredStore::Creds.new(full_credentials_hash[provider_sym])
       end
 
+      # Convenience method for producing an encrypted version of a file.  This only returns
+      # the encrypted version as a string, you will have to save it yourself if desired
+      # @param file_location [String]
+      # @returns String
       def encrypt_file(file_location)
         crypto.encrypt(File.open(file_location)).to_s
       end
@@ -37,6 +45,10 @@ module Flo
 
       def decrypted_file
         crypto.decrypt(cred_file)
+      end
+
+      def full_credentials_hash
+        @full_credentials_hash ||= YAML.load(decrypted_file.read)
       end
 
       def crypto

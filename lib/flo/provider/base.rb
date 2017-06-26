@@ -13,6 +13,8 @@ module Flo
     #
     class Base
 
+      attr_writer :cred_store
+
       # Creates an instance of a provider
       # @param opts [Hash] Arbitrary array of options defined by the provider
       #   using the {.option} method

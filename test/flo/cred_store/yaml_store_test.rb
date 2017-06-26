@@ -18,10 +18,15 @@ module Flo
         @yaml_fixture ||= File.join(FIXTURES_ROOT, 'cred_example.yml')
       end
 
-      def test_element_reference_fetches_a_value_from_yaml_file
-        assert_equal 'foo', ::YAML.load(File.read(yaml_fixture))['provider']['key']
+      def test_credentials_for_returns_credentials_object
+        refute_nil ::YAML.load(File.read(yaml_fixture))[:provider]
+        assert_kind_of Flo::CredStore::Creds, subject.credentials_for(:provider)
+      end
 
-        assert_equal 'foo', subject['provider']['key']
+      def test_credentials_for_returns_creds_object_if_provider_is_not_present
+        assert_nil ::YAML.load(File.read(yaml_fixture))[:missing_provider]
+
+        assert_kind_of Flo::CredStore::Creds, subject.credentials_for(:missing_provider)
       end
 
     end
