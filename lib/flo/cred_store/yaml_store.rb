@@ -20,7 +20,7 @@ module Flo
 
       # Returns the credentials for the requested provider
       # @param provider_sym [Symbol]
-      # @returns Hash
+      # @return [Flo::CredStore::Creds]
       #
       def credentials_for(provider_sym)
         Flo::CredStore::Creds.new(full_credentials_hash[provider_sym])

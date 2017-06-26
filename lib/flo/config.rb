@@ -20,7 +20,7 @@ module Flo
       # Returns a lambda that takes a credential store for a specific provider as an argument.
       # This prevents providers from accessing the credentials for another provider
       # @param key [Symbol,String]
-      # @returns lambda
+      # @return [lambda]
       def [](key)
         lambda { |cred_store| cred_store[key] }
       end
@@ -51,7 +51,7 @@ module Flo
 
     # Returns an object that responds to [], but instead of returning a value, returns
     # a lambda that can be evaluated later in the context of the credentials for the provider
-    # @returns LazyCred
+    # @return [LazyCred]
     def creds
       LazyCreds.new
     end

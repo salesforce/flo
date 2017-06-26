@@ -16,7 +16,7 @@ module Flo
 
       # Decrypts the credentials file and returns the credentials for the requested provider
       # @param provider_sym [Symbol]
-      # @returns Hash
+      # @return [Flo::CredStore::Creds]
       #
       def credentials_for(provider_sym)
         Flo::CredStore::Creds.new(full_credentials_hash[provider_sym])
@@ -25,7 +25,7 @@ module Flo
       # Convenience method for producing an encrypted version of a file.  This only returns
       # the encrypted version as a string, you will have to save it yourself if desired
       # @param file_location [String]
-      # @returns String
+      # @return [String]
       def encrypt_file(file_location)
         crypto.encrypt(File.open(file_location)).to_s
       end
