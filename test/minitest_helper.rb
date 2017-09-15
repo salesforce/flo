@@ -17,6 +17,7 @@ ENV["MT_NO_SKIP_MSG"] = "true"
 
 require 'minitest/autorun'
 require 'pry'
+require 'minitest/hell'
 
 module Flo
   class UnitTest < Minitest::Test

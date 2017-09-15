@@ -5,12 +5,17 @@
 
 require_relative '../minitest_helper'
 require 'flo/config'
+require 'yaml'
 
 module Flo
   class ConfigTest < Flo::UnitTest
 
     def subject
-      @subject ||= Flo::Config.new
+      @subject ||= begin
+        subj = Flo::Config.new()
+        subj.cred_store = MockCredStore.new
+        subj
+      end
     end
 
     def test_provider_instantiates_new_provider
@@ -25,11 +30,33 @@ module Flo
       end
     end
 
+    def test_cred_store_defaults_to_yaml
+      assert_kind_of Flo::CredStore::YamlStore, Flo::Config.new.cred_store
+    end
+
+    def test_cred_store_can_be_assigned
+      expected_cred_store = Object.new
+
+      subject.cred_store = expected_cred_store
+
+      assert_same expected_cred_store, subject.cred_store
+    end
+
+    def test_creds_returns_a_lambda
+      assert_respond_to subject.creds[:some_value], :call
+    end
   end
+
   module Provider
     class MockProvider
+      attr_writer :cred_store
       def initialize(args={})
       end
+    end
+  end
+  class MockCredStore
+    def credentials_for(provider)
+      {}
     end
   end
 end

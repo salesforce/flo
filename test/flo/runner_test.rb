@@ -78,7 +78,7 @@ module Flo
     def test_execute_calls_command_with_args
       args = {foo: :bar}
       providers_hash = Object.new
-      new_command = lambda { |args| true }
+      new_command = lambda { |_args| true }
 
       command_class_mock.expect(:new, new_command, [{ providers: providers_hash }])
       config_mock.expect(:providers, providers_hash)

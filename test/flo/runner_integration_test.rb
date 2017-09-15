@@ -30,6 +30,12 @@ module Flo
       assert_equal false, response.success?
     end
 
+    def test_credentials_are_utilized
+      response = subject.execute([:validate_password])
+
+      assert_equal true, response.success?
+    end
+
   end
 end
 
