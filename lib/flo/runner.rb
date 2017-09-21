@@ -47,14 +47,28 @@ module Flo
       evaluate_file(config_file)
     end
 
+    # Open and parse any available config files, in the following order:
+    # * ENV['FLO_CONFIG_FILE'] # Allows the addition of custom files
+    # * ./.flo
+    # * ~/.flo
+    # See {#load_config_file}
+    #
+    def load_default_config_files
+      [ENV['FLO_CONFIG_FILE'], File.join(Dir.pwd, '.flo'), File.join(Dir.home, '.flo')].compact.each do |file|
+        if File.exist?(file)
+          self.load_config_file(file)
+        end
+      end
+    end
+
     # Executes the command specified, with the arguments specified
     # @param command_namespace [Array<Symbol>] An array containing the name of
     #   the command as a symbol, including the namespace.  For example, the
     #   command "issue submit" would become [:issue, :submit]
-    # @param args={} [Hash] Options that will get passed to the command
+    # @param args=[] [Array] Options that will get passed to the command
     #
-    def execute(command_namespace, args={})
-      commands[command_namespace].call(args)
+    def execute(command_namespace, args=[])
+      commands[command_namespace][:command].call(args)
     end
 
     # @api dsl
@@ -75,13 +89,15 @@ module Flo
     # DSL method: Creates and defines a {Command}, adding it to the command collection.
     # Definition for the command should happen inside of the required block.
     # See {Command} for methods available within the block.
-    # @param command_namespace [Array<Symbol>] Array of symbols representing the
-    #   command including the namespace
-    # @yield [args*]The block containing the definition for the command.
+    # @param command_namespace [String] name of the command
+    # @option opts [String] :summary Summary of the command
+    # @option opts [String] :description Detailed description of the command
+    # @yield [args*] The block containing the definition for the command.
     #   Arguments passed into {#execute} are available within the block
     #
-    def register_command(command_namespace, &blk)
-      commands[command_namespace] = command_class.new(providers: config.providers, &blk)
+    def register_command(command_namespace, opts={}, &blk)
+      opts[:command] = command_class.new(providers: config.providers, &blk)
+      commands[command_namespace] = opts
     end
     expose :register_command
 

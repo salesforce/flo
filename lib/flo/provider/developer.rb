@@ -22,11 +22,6 @@ module Flo
         true
       end
 
-      def echo(opts={})
-        puts opts.inspect
-        Flo::Provider::Response.new(true)
-      end
-
       def has_option(opts={})
         Flo::Provider::Response.new(options.include?(opts[:option]))
       end

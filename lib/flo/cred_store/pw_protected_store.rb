@@ -48,7 +48,7 @@ module Flo
       end
 
       def full_credentials_hash
-        @full_credentials_hash ||= YAML.load(decrypted_file.read)
+        @full_credentials_hash ||= YAML.load(decrypted_file.read) || {}
       end
 
       def crypto

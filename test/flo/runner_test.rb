@@ -56,21 +56,7 @@ module Flo
 
       subject.register_command(:foo) { }
 
-      assert_equal new_command, subject.commands[:foo]
-
-      command_class_mock.verify
-    end
-
-    def test_register_command_namespaced_adds_new_command_to_collection
-      config_mock.expect(:providers, {})
-      new_command = Object.new
-      command_class_mock.expect(:new, new_command, [{ providers: {} }])
-
-      @command_collection_mock = {}
-
-      subject.register_command([:foo, :bar]) { }
-
-      assert_equal(new_command, subject.commands[[:foo, :bar]])
+      assert_equal new_command, subject.commands[:foo][:command]
 
       command_class_mock.verify
     end
@@ -95,6 +81,17 @@ module Flo
       config_mock.verify
     end
 
+    def test_load_default_config_files_loads_available_config_files
+      File.stub(:exist?, true) do
+        loaded_files = []
+        subject.stub(:load_config_file, lambda { |file| loaded_files << file } ) do
+
+          subject.load_default_config_files
+        end
+
+        assert_equal [File.join(Dir.pwd, '.flo'), File.join(Dir.home, '.flo')], loaded_files
+      end
+    end
 
   end
 end

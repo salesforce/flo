@@ -19,19 +19,19 @@ module Flo
     end
 
     def test_execute_returns_success
-      response = subject.execute([:task, :start])
+      response = subject.execute('task:start')
 
       assert_equal true, response.success?
     end
 
     def test_execute_success_is_false_when_perform_fails
-      response = subject.execute([:task, :start], success: false)
+      response = subject.execute('task:start', [{success: false}])
 
       assert_equal false, response.success?
     end
 
     def test_credentials_are_utilized
-      response = subject.execute([:validate_password])
+      response = subject.execute(:validate_password)
 
       assert_equal true, response.success?
     end

@@ -18,6 +18,12 @@ module Flo
         assert_equal 'foo', subject[:key]
       end
 
+      def test_element_reference_raises_on_missing_value
+        assert_raises(Flo::MissingCredentialError) do
+          subject[:missing_key]
+        end
+      end
+
     end
   end
 end

@@ -4,7 +4,7 @@
 # For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 require 'yaml'
-require 'flo'
+require 'flo/error'
 require 'flo/cred_store/creds'
 
 module Flo
@@ -29,7 +29,7 @@ module Flo
       private
 
       def full_credentials_hash
-        @full_credentials_hash ||= YAML.load(File.read(@location))
+        @full_credentials_hash ||= YAML.load(File.read(@location)) || {}
       end
     end
   end

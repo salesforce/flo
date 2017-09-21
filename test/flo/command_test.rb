@@ -72,6 +72,18 @@ module Flo
       subject.perform :mocked_provider, :provider_method, {evaluated_later: subject.state(:mocked_provider).state_method }
     end
 
+    def test_required_parameters_returns_array
+      @subject_block = lambda{|a,b,c: nil, d: 'foo'| }
+      assert_equal [:a, :b], subject.required_parameters
+    end
+
+
+
+    def test_optional_parameters_returns_array
+      @subject_block = lambda{|a,b,c: nil, d: 'foo'| }
+      assert_equal [:c, :d], subject.optional_parameters
+    end
+
     class MockProvider
       attr_reader :args, :state_method_called
 

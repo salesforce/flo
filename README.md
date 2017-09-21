@@ -1,5 +1,5 @@
 # Flo
-[![Gem Version](https://badge.fury.io/rb/flo.svg)](https://badge.fury.io/rb/flo) [![Code Climate](https://codeclimate.com/github/salesforce/flo/badges/gpa.svg)](https://codeclimate.com/github/salesforce/flo) [![Build Status](https://semaphoreci.com/api/v1/justinpowers/flo/branches/master/shields_badge.svg)](https://semaphoreci.com/justinpowers/flo)
+[![Gem Version](https://badge.fury.io/rb/flo.svg)](https://badge.fury.io/rb/flo) [![Code Climate](https://codeclimate.com/github/salesforce/flo/badges/gpa.svg)](https://codeclimate.com/github/salesforce/flo) [![Test Coverage](https://codeclimate.com/github/salesforce/flo/badges/coverage.svg)](https://codeclimate.com/github/salesforce/flo/coverage) [![Build Status](https://semaphoreci.com/api/v1/justinpowers/flo/branches/master/shields_badge.svg)](https://semaphoreci.com/justinpowers/flo) [![Inline docs](http://inch-ci.org/github/salesforce/flo.svg?branch=master)](http://inch-ci.org/github/salesforce/flo)
 
 
 Flo is a local workflow automation tool that helps you get things done.  This gem contains the core functionality for Flo, plugins for interacting with various systems can be found in separate provider gems.
@@ -29,8 +29,17 @@ http://www.rubydoc.info/github/salesforce/flo/
 
 ### Command line usage
 
-COMING SOON!
-A command line parser has not yet been added.  If you require a script that can be invoked from the command line, you can create a ruby script that creates and runs a `Flo::Runner` instance.  See [Ruby script usage](#Ruby_script_usage) for more details.
+If you have a `.flo` configuration file (See [.flo configuration file](#flo-configuration-file)), in your current working directory and/or your home directory, flo will parse your configuration file(s) and generate CLI commands for you.  To list out the possible commands, use
+
+```bash
+flo help
+```
+
+You can also see the usage and options for specific commands:
+
+```bash
+flo help <command>
+```
 
 ### Ruby script usage
 
@@ -45,7 +54,7 @@ runner = Flo::Runner.new
 runner.load_config_file(File.join(__dir__,'.flo'))
 
 # Run the something:useful command defined in the .flo file
-response = runner.execute([:something, :useful], id: '123')
+response = runner.execute('something:useful', id: '123')
 ```
 
 
@@ -73,7 +82,7 @@ You can register any number of commands.  Commands are namespaced to make it eas
 # Registers a command for starting a feature - feature:start.  This command has
 # one required argument: 'feature_name'.  Note that in order for this to work,
 # you will need to declare the git_flo provider in the config section.
-register_command([:feature, :start]) do |feature_name: nil|
+register_command('feature:start') do |feature_name: nil|
 
   # During command execution, perform the :check_out_or_create_branch method on
   # the git_flo provider, passing in the :from and :name arguments
@@ -88,6 +97,7 @@ end
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+6. If this is your first contribution, you will need Accept the Contributor License Agreement.  You can follow the link in the pull request 'checks' section to do so.
 
 ## License
 

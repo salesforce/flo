@@ -10,10 +10,10 @@ config do |cfg|
   cfg.provider :developer, password: cfg.creds['some_value']
 end
 
-register_command([:task, :start]) do |success: true|
+register_command('task:start') do |success: true|
   perform :developer, :is_successful, { success: state(:developer).return_true }
 end
 
-register_command([:validate_password]) do |success: true|
+register_command(:validate_password) do |success: true|
   perform :developer, :has_option, { option: :password }
 end
