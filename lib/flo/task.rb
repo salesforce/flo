@@ -21,7 +21,7 @@ module Flo
       @provider = provider
       @method_sym = method_sym
 
-      raise ArgumentError.new("Expected provider_options to be a hash") unless provider_options.is_a? Hash
+      raise ArgumentError.new("Expected provider_options to be a Hash") unless provider_options.is_a? Hash
       @provider_options = provider_options
     end
 
@@ -29,25 +29,43 @@ module Flo
     # passed in that are merged into the parameters that were provided in {initialize}.
     # Proc values will be evaluated before being passed to the provider.
     #
-    # @param [Hash] args={} Additional arguments to pass to the provider method
+    # @param [Array] args=[] Additional arguments to pass to the provider method
     # @return [#success?] Response of the provider's method
-    def call(args={})
-      @provider.public_send(method_sym, merged_evaluated_args(args))
+    def call(args=[])
+      raise ArgumentError.new("Expected Array") unless args.is_a? Array
+      @provider.public_send(method_sym, *merged_evaluated_args(args))
     end
 
     private
     attr_reader :provider, :method_sym, :provider_options
 
     def merged_evaluated_args(args)
-      evaluate_proc_values(provider_options.merge args)
+      unless args[-1].is_a? Hash
+        args.push Hash.new
+      end
+
+      args[-1] = provider_options.merge(args[-1])
+      evaluate_proc_values(args)
     end
 
-    def evaluate_proc_values(args={})
-      hsh = {}
-      args.each do |k, v|
-        hsh[k] = v.is_a?(Proc) ? v.call : v
+    # For each value in the args array, evaluate any procs.
+    # If the value is a hash, evaluate any values in the hash
+    # that are procs.
+    def evaluate_proc_values(args=[])
+      args.collect do |arg|
+        case arg
+        when Proc
+          arg.call
+        when Hash
+          hsh = {}
+          arg.each do |k, v|
+            hsh[k] = v.is_a?(Proc) ? v.call : v
+          end
+          hsh
+        else
+          arg
+        end
       end
-      hsh
     end
   end
 end

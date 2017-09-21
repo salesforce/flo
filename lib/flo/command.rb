@@ -87,11 +87,32 @@ module Flo
       end.last
     end
 
+    # Returns a list of any required parameters
+    #
+    # Required parameters are generated automatically by inspecting the required
+    # parameters for the definition lambda
+    # @return [Array<Symbol>] An array of symbols representing required parameters
+    #
+    def required_parameters
+      definition_lambda.parameters.select { |key,_value| key == :req }.map { |_key,value| value }
+    end
+
+
+    # Returns a list of any optional parameters
+    #
+    # Optional parameters are generated automatically by inspecting the optional
+    # parameters for the definition lambda
+    # @return [Array<Symbol>] An array of symbols representing optional parameters
+    #
+    def optional_parameters
+      definition_lambda.parameters.select { |key,_value| key == :key }.map { |_key,value| value }
+    end
+
     private
 
     attr_reader :tasks, :definition_lambda, :providers, :state_class
 
-    def evaluate_command_definition(*args)
+    def evaluate_command_definition(args)
       cleanroom.instance_exec(*args, &definition_lambda)
     end
 

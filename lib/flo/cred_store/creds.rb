@@ -18,11 +18,9 @@ module Flo
       # @raises Flo::MissingCredentialError if key does not exist
       #
       def [](key)
-        if @credentials.key?(key)
-          @credentials[key]
-        else
-          raise Flo::MissingCredentialError unless hsh.key?(key)
-        end
+        raise Flo::MissingCredentialError unless @credentials.key?(key)
+
+        @credentials[key]
       end
     end
   end

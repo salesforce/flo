@@ -31,14 +31,14 @@ module Flo
 
     def test_passes_on_args
       provider.expect(:foo, true, [{ bar: 1 }])
-      subject.call(bar: 1)
+      subject.call([{bar: 1}])
       provider.verify
     end
 
     def test_merges_args_with_provider_options
       @provider_options = { baz: 2 }
       provider.expect(:foo, true, [{ bar: 1, baz: 2 }])
-      subject.call(bar: 1)
+      subject.call([{bar: 1}])
       provider.verify
     end
 
@@ -50,14 +50,24 @@ module Flo
     def test_called_args_override_provider_options
       @provider_options = { bar: 2 }
       provider.expect(:foo, true, [{ bar: 1 }])
-      subject.call(bar: 1)
+      subject.call([{bar: 1}])
       provider.verify
     end
 
     def test_procs_in_options_are_evaluated_before_provider_method_is_called
-      @provider_options = { baz: Proc.new { 2 }}
+      @provider_options = { baz: Proc.new { 2 } }
+      provider.expect(:foo, true, [:sym, :proc_result, { baz: 2 }])
+      subject.call([:sym, Proc.new { :proc_result }])
+
+      provider.verify
+    end
+
+    def test_procs_in_args_are_evaluated_before_provider_method_is_called
+      @provider_options = { baz: Proc.new { 2 } }
       provider.expect(:foo, true, [{ bar: 1, baz: 2 }])
-      subject.call(bar: Proc.new { 1 })
+      subject.call([{bar: Proc.new { 1 }}])
+
+      provider.verify
     end
   end
 end
