@@ -69,5 +69,13 @@ module Flo
 
       provider.verify
     end
+
+    #Mutating the args will affect any tasks that run in the future
+    def test_call_does_not_mutate_original_args
+      args = [{bar: 1}].freeze
+      provider.expect(:foo, true, args)
+      subject.call(args)
+      provider.verify
+    end
   end
 end

@@ -33,7 +33,7 @@ module Flo
     # @return [#success?] Response of the provider's method
     def call(args=[])
       raise ArgumentError.new("Expected Array") unless args.is_a? Array
-      @provider.public_send(method_sym, *merged_evaluated_args(args))
+      @provider.public_send(method_sym, *merged_evaluated_args(args.dup))
     end
 
     private
